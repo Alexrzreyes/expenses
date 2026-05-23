@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GastosFlow - Control de Gastos e Ingresos Inteligente</title>
+  <meta name="description" content="Lleva el control de tus finanzas personales con GastosFlow. Dashboard interactivo, presupuestos mensuales, categorías personalizadas y estadísticas detalladas.">
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="/src/css/style.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dark-theme">
+  <!-- Layout Wrapper -->
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon-wrapper">
+          <i data-lucide="trending-up" class="logo-icon"></i>
+        </div>
+        <h1 id="app-title">GastosFlow</h1>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Budget Progress indicator quick glance -->
+        <div id="quick-budget-badge" class="quick-budget-badge hidden">
+          <i data-lucide="piggy-bank"></i>
+          <span id="quick-budget-text">Presupuesto: --</span>
+        </div>
+        
+        <!-- Theme Toggle -->
+        <button id="theme-toggle-btn" class="icon-btn" aria-label="Cambiar tema">
+          <i data-lucide="sun" class="sun-icon"></i>
+          <i data-lucide="moon" class="moon-icon"></i>
+        </button>
+        
+        <!-- Settings Trigger -->
+        <button id="settings-toggle-btn" class="icon-btn" aria-label="Configuración">
+          <i data-lucide="settings"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="app-main">
+      
+      <!-- Top Navigation Tabs -->
+      <nav class="app-navigation-tabs" aria-label="Navegación principal">
+        <button class="nav-tab-btn active" data-target="view-dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-tab-btn" data-target="view-debts">
+          <i data-lucide="landmark"></i>
+          <span>Deudas y Préstamos</span>
+        </button>
+      </nav>
+
+      <!-- VIEW 1: DASHBOARD -->
+      <div id="view-dashboard" class="view-panel">
+        <!-- 1. Stats Dashboard -->
+        <section class="dashboard-grid" aria-labelledby="dashboard-heading">
+          <h2 id="dashboard-heading" class="sr-only">Resumen Financiero</h2>
+          
+          <!-- Balance Card -->
+          <div class="stat-card balance-card">
+            <div class="card-glow"></div>
+            <div class="card-content">
+              <span class="card-label">Balance Total</span>
+              <div class="card-value" id="total-balance">$0.00</div>
+              <div class="card-trend" id="balance-trend">
+                <i data-lucide="info" class="trend-icon"></i>
+                <span id="balance-trend-text">Calculado de tus ingresos y gastos</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Income Card -->
+          <div class="stat-card income-card">
+            <div class="card-content">
+              <div class="card-header-row">
+                <span class="card-label">Ingresos</span>
+                <div class="icon-circle income">
+                  <i data-lucide="arrow-down-left"></i>
+                </div>
+              </div>
+              <div class="card-value text-income" id="total-income">$0.00</div>
+              <span class="card-subtext" id="income-count">0 transacciones</span>
+            </div>
+          </div>
+          
+          <!-- Expenses Card -->
+          <div class="stat-card expense-card">
+            <div class="card-content">
+              <div class="card-header-row">
+                <span class="card-label">Gastos</span>
+                <div class="icon-circle expense">
+                  <i data-lucide="arrow-up-right"></i>
+                </div>
+              </div>
+              <div class="card-value text-expense" id="total-expenses">$0.00</div>
+              <span class="card-subtext" id="expense-count">0 transacciones</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Budget Alerts & Progress -->
+        <section id="budget-progress-section" class="budget-section card hidden" style="margin-top: 24px;">
+          <div class="budget-section-header">
+            <h3>Progreso del Presupuesto Mensual</h3>
+            <span id="budget-percentage" class="budget-percentage">0%</span>
+          </div>
+          <div class="progress-bar-container">
+            <div id="global-budget-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+          <div class="budget-details-text">
+            <span id="budget-spent-text">Gastado: $0.00 de $0.00</span>
+            <span id="budget-remaining-text">Restante: $0.00</span>
+          </div>
+        </section>
+
+        <!-- 3. Visualization Charts & Category breakdown -->
+        <section class="charts-and-budgets-grid" style="margin-top: 24px;">
+          <!-- Chart Container: Distribution -->
+          <div class="card chart-card">
+            <div class="chart-header">
+              <h3>Distribución de Gastos</h3>
+              <span class="chart-subtitle">Por categorías principales</span>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="category-chart"></canvas>
+              <div id="no-chart-data" class="no-data-overlay">
+                <i data-lucide="pie-chart" class="no-data-icon"></i>
+                <p>Sin gastos registrados para mostrar el gráfico</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Container: History -->
+          <div class="card chart-card">
+            <div class="chart-header">
+              <h3>Historial Mensual</h3>
+              <span class="chart-subtitle">Ingresos vs Gastos</span>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="history-chart"></canvas>
+              <div id="no-history-data" class="no-data-overlay">
+                <i data-lucide="bar-chart-3" class="no-data-icon"></i>
+                <p>Registra transacciones para ver la tendencia histórica</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Transactions List & Filter Toolbar -->
+        <section class="transactions-section card" style="margin-top: 24px;">
+          <div class="section-title-bar">
+            <h3>Transacciones Recientes</h3>
+            <button id="btn-open-add-modal" class="btn btn-primary">
+              <i data-lucide="plus"></i>
+              <span>Nueva Transacción</span>
+            </button>
+          </div>
+
+          <!-- Filters Toolbar -->
+          <div class="filters-toolbar">
+            <!-- Search input -->
+            <div class="search-input-wrapper">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="search-filter" placeholder="Buscar por nota o descripción..." aria-label="Buscar transacciones">
+            </div>
+
+            <!-- Select filters -->
+            <div class="filter-controls">
+              <div class="select-wrapper">
+                <select id="type-filter" aria-label="Filtrar por tipo">
+                  <option value="all">Todos los tipos</option>
+                  <option value="expense">Solo Gastos</option>
+                  <option value="income">Solo Ingresos</option>
+                </select>
+              </div>
+
+              <div class="select-wrapper">
+                <select id="category-filter" aria-label="Filtrar por categoría">
+                  <option value="all">Todas las categorías</option>
+                  <!-- Dynamic categories loaded here -->
+                </select>
+              </div>
+
+              <div class="select-wrapper">
+                <select id="time-filter" aria-label="Filtrar por fecha">
+                  <option value="this-month">Este Mes</option>
+                  <option value="last-month">Mes Anterior</option>
+                  <option value="last-7-days">Últimos 7 Días</option>
+                  <option value="last-30-days">Últimos 30 Días</option>
+                  <option value="all-time">Todo el Historial</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transactions Container -->
+          <div class="transactions-list-wrapper">
+            <div id="transactions-empty-state" class="empty-state">
+              <div class="empty-illustration">
+                <i data-lucide="receipt" class="empty-icon"></i>
+              </div>
+              <h4>No hay transacciones registradas</h4>
+              <p>Comienza agregando un gasto o un ingreso para visualizar tu flujo de efectivo.</p>
+              <button id="btn-empty-add-trigger" class="btn btn-secondary">
+                Agregar primera transacción
+              </button>
+            </div>
+
+            <div id="transactions-list" class="transactions-list hidden">
+              <!-- Dynamic elements loaded here -->
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- VIEW 2: DEBTS -->
+      <div id="view-debts" class="view-panel hidden">
+        <!-- Summary Cards -->
+        <section class="dashboard-grid" aria-labelledby="debts-summary-heading">
+          <h2 id="debts-summary-heading" class="sr-only">Resumen de Deudas</h2>
+          
+          <!-- Owed to Others Card -->
+          <div class="stat-card expense-card">
+            <div class="card-content">
+              <div class="card-header-row">
+                <span class="card-label">Por Pagar (Mis Deudas)</span>
+                <div class="icon-circle expense">
+                  <i data-lucide="arrow-up-right"></i>
+                </div>
+              </div>
+              <div class="card-value text-expense" id="total-debts-to-pay">$0.00</div>
+              <span class="card-subtext" id="debts-to-pay-count">0 activas</span>
+            </div>
+          </div>
+
+          <!-- Owed to Me Card -->
+          <div class="stat-card income-card">
+            <div class="card-content">
+              <div class="card-header-row">
+                <span class="card-label">Por Cobrar (Me deben)</span>
+                <div class="icon-circle income">
+                  <i data-lucide="arrow-down-left"></i>
+                </div>
+              </div>
+              <div class="card-value text-income" id="total-debts-to-collect">$0.00</div>
+              <span class="card-subtext" id="debts-to-collect-count">0 activas</span>
+            </div>
+          </div>
+
+          <!-- Quick Debt Action Card -->
+          <div class="stat-card balance-card">
+            <div class="card-glow"></div>
+            <div class="card-content" style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+              <span class="card-label" style="margin-bottom: 12px;">Gestión de Préstamos</span>
+              <button id="btn-open-debt-modal" class="btn btn-primary" style="width: 100%;">
+                <i data-lucide="plus"></i>
+                <span>Nueva Deuda / Préstamo</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Active and Settled Debts Listing -->
+        <section class="transactions-section card" style="margin-top: 30px;">
+          <div class="section-title-bar">
+            <h3>Tus Cuentas Pendientes</h3>
+          </div>
+          
+          <!-- Debts Container -->
+          <div id="debts-empty-state" class="empty-state">
+            <div class="empty-illustration">
+              <i data-lucide="landmark" class="empty-icon"></i>
+            </div>
+            <h4>No tienes deudas registradas</h4>
+            <p>Registra dinero que debas a terceros o préstamos que hayas hecho para realizar un seguimiento de los abonos.</p>
+          </div>
+
+          <div id="debts-list" class="debts-list hidden">
+            <!-- Dynamic debt cards populated here -->
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; 2026 GastosFlow. Creado con amor por el equipo de diseño y código.</p>
+    </footer>
+  </div>
+
+  <!-- MODAL: ADD / EDIT TRANSACTION -->
+  <div id="transaction-modal" class="modal-overlay" aria-hidden="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="transaction-modal-title">Nueva Transacción</h3>
+        <button id="btn-close-transaction-modal" class="close-btn" aria-label="Cerrar modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="transaction-form" class="modal-body">
+        <input type="hidden" id="edit-transaction-id" value="">
+        
+        <!-- Transaction Type Switcher -->
+        <div class="type-switcher-container">
+          <label class="type-switch-label">
+            <input type="radio" name="tx-type" value="expense" checked id="switch-type-expense">
+            <span class="type-switch-btn expense">Gasto</span>
+          </label>
+          <label class="type-switch-label">
+            <input type="radio" name="tx-type" value="income" id="switch-type-income">
+            <span class="type-switch-btn income">Ingreso</span>
+          </label>
+        </div>
+
+        <!-- Amount Input -->
+        <div class="form-group">
+          <label for="tx-amount">Monto (<span class="currency-symbol">$</span>)</label>
+          <div class="amount-input-wrapper">
+            <span class="currency-prefix-addon currency-symbol">$</span>
+            <input type="number" id="tx-amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required autofocus>
+          </div>
+        </div>
+
+        <!-- Category Select -->
+        <div class="form-group">
+          <label for="tx-category">Categoría</label>
+          <div class="select-wrapper modal-select">
+            <select id="tx-category" name="category" required>
+              <!-- Dynamic options loaded here -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Date Input -->
+        <div class="form-group">
+          <label for="tx-date">Fecha</label>
+          <input type="date" id="tx-date" name="date" required>
+        </div>
+
+        <!-- Note Input -->
+        <div class="form-group">
+          <label for="tx-note">Nota / Descripción</label>
+          <input type="text" id="tx-note" name="note" placeholder="Ej. Supermercado semanal, Pago de nómina...">
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-transaction" class="btn btn-text">Cancelar</button>
+          <button type="submit" id="btn-save-transaction" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTINGS & BUDGET -->
+  <div id="settings-modal" class="modal-overlay" aria-hidden="true" role="dialog">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <h3>Configuración y Presupuesto</h3>
+        <button id="btn-close-settings-modal" class="close-btn" aria-label="Cerrar modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body settings-layout">
+        
+        <!-- Left Pane: Sections Menu -->
+        <aside class="settings-sidebar">
+          <button class="settings-tab-btn active" data-tab="tab-budget">
+            <i data-lucide="piggy-bank"></i>
+            <span>Presupuestos</span>
+          </button>
+          <button class="settings-tab-btn" data-tab="tab-categories">
+            <i data-lucide="tags"></i>
+            <span>Categorías</span>
+          </button>
+          <button class="settings-tab-btn" data-tab="tab-general">
+            <i data-lucide="sliders"></i>
+            <span>Ajustes Generales</span>
+          </button>
+          <button class="settings-tab-btn" data-tab="tab-data">
+            <i data-lucide="database"></i>
+            <span>Datos y Backup</span>
+          </button>
+        </aside>
+
+        <!-- Right Pane: Active Panels -->
+        <div class="settings-content">
+          
+          <!-- TAB 1: Budget Settings -->
+          <div class="settings-panel active" id="tab-budget">
+            <h4>Límites de Presupuesto</h4>
+            <p class="panel-desc">Establece límites para controlar tus egresos mensuales. Te avisaremos cuando estés cerca de superarlos.</p>
+            
+            <div class="settings-form-group">
+              <label for="setting-global-budget">Presupuesto Mensual Global (<span class="currency-symbol">$</span>)</label>
+              <div class="inline-input-row">
+                <input type="number" id="setting-global-budget" placeholder="Sin límite" min="0" step="10">
+                <button id="btn-save-global-budget" class="btn btn-secondary">Establecer</button>
+              </div>
+              <small class="form-hint">Pon 0 o déjalo vacío para desactivar el límite global.</small>
+            </div>
+
+            <div class="category-budgets-section">
+              <h5>Presupuestos por Categoría</h5>
+              <div id="category-budgets-list" class="category-budgets-list">
+                <!-- Dynamically populated list of category budget inputs -->
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: Categories Management -->
+          <div class="settings-panel" id="tab-categories">
+            <h4>Gestionar Categorías</h4>
+            <p class="panel-desc">Crea nuevas categorías personalizadas para organizar tus finanzas.</p>
+
+            <form id="new-category-form" class="new-category-form">
+              <div class="form-group">
+                <label for="new-cat-name">Nombre de Categoría</label>
+                <input type="text" id="new-cat-name" placeholder="Ej. Regalos, Gimnasio..." required>
+              </div>
+              
+              <div class="form-group">
+                <label>Color</label>
+                <div class="color-presets">
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#ef4444" checked><span style="background-color: #ef4444"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#f97316"><span style="background-color: #f97316"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#eab308"><span style="background-color: #eab308"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#22c55e"><span style="background-color: #22c55e"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#06b6d4"><span style="background-color: #06b6d4"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#3b82f6"><span style="background-color: #3b82f6"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#6366f1"><span style="background-color: #6366f1"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#a855f7"><span style="background-color: #a855f7"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#ec4899"><span style="background-color: #ec4899"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#64748b"><span style="background-color: #64748b"></span></label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Icono</label>
+                <div class="icon-presets">
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="tag" checked><i data-lucide="tag"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="shopping-bag"><i data-lucide="shopping-bag"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="coffee"><i data-lucide="coffee"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="clapperboard"><i data-lucide="clapperboard"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="dumbbell"><i data-lucide="dumbbell"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="plane"><i data-lucide="plane"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="gift"><i data-lucide="gift"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="wifi"><i data-lucide="wifi"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="car"><i data-lucide="car"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="wrench"><i data-lucide="wrench"></i></label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-secondary">Crear Categoría</button>
+            </form>
+
+            <div class="existing-categories-section">
+              <h5>Categorías Activas</h5>
+              <div id="active-categories-list" class="active-categories-list">
+                <!-- Dynamically loaded list of categories with delete button -->
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: General Settings -->
+          <div class="settings-panel" id="tab-general">
+            <h4>Ajustes Generales</h4>
+            <p class="panel-desc">Modifica los parámetros generales de la interfaz.</p>
+
+            <div class="settings-form-group">
+              <label for="setting-currency">Moneda de la Aplicación</label>
+              <div class="select-wrapper">
+                <select id="setting-currency" aria-label="Cambiar moneda">
+                  <option value="$">Peso / Dólar ($)</option>
+                  <option value="€">Euro (€)</option>
+                  <option value="£">Libra Esterlina (£)</option>
+                  <option value="¥">Yen / Yuan (¥)</option>
+                  <option value="Bs">Bolívares (Bs)</option>
+                  <option value="S/">Soles (S/)</option>
+                  <option value="CLP">Peso Chileno (CLP)</option>
+                </select>
+              </div>
+              <small class="form-hint">Todos los montos y gráficos usarán esta moneda.</small>
+            </div>
+            
+            <div class="settings-form-group">
+              <label for="setting-visual-alerts">Alertas de Presupuesto</label>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="setting-visual-alerts" checked>
+                <label for="setting-visual-alerts">Mostrar notificaciones visuales en la app al exceder el 80% del presupuesto.</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: Data & Backup -->
+          <div class="settings-panel" id="tab-data">
+            <h4>Datos y Copias de Seguridad</h4>
+            <p class="panel-desc">Exporta o importa tus datos locales para transferirlos a otro dispositivo o mantenerlos a salvo.</p>
+
+            <div class="data-actions-grid">
+              <div class="data-action-card">
+                <h5>Exportar Datos (JSON)</h5>
+                <p>Descarga un archivo con toda tu información (transacciones, categorías y configuraciones).</p>
+                <button id="btn-export-json" class="btn btn-secondary">
+                  <i data-lucide="download"></i>
+                  <span>Respaldar JSON</span>
+                </button>
+              </div>
+
+              <div class="data-action-card">
+                <h5>Exportar Reporte (CSV)</h5>
+                <p>Descarga tus transacciones en un formato compatible con Excel o Google Sheets.</p>
+                <button id="btn-export-csv" class="btn btn-secondary">
+                  <i data-lucide="file-spreadsheet"></i>
+                  <span>Descargar CSV</span>
+                </button>
+              </div>
+
+              <div class="data-action-card">
+                <h5>Importar Copia (JSON)</h5>
+                <p>Restaura tus datos desde un archivo JSON previamente exportado. <strong class="text-danger">¡Esto sobrescribirá los datos actuales!</strong></p>
+                <label for="import-file-input" class="btn btn-outline-danger btn-file-label">
+                  <i data-lucide="upload"></i>
+                  <span>Seleccionar Archivo</span>
+                  <input type="file" id="import-file-input" accept=".json" class="hidden-file-input">
+                </label>
+              </div>
+
+              <div class="data-action-card border-danger">
+                <h5>Reiniciar Aplicación</h5>
+                <p>Borra permanentemente todas las transacciones, categorías personalizadas y configuraciones.</p>
+                <button id="btn-reset-app" class="btn btn-danger">
+                  <i data-lucide="trash-2"></i>
+                  <span>Restablecer Todo</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT DEBT -->
+  <div id="debt-modal" class="modal-overlay" aria-hidden="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="debt-modal-title">Nueva Deuda / Préstamo</h3>
+        <button id="btn-close-debt-modal" class="close-btn" aria-label="Cerrar modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="debt-form" class="modal-body">
+        <input type="hidden" id="edit-debt-id" value="">
+        
+        <!-- Debt Type Switcher -->
+        <div class="type-switcher-container">
+          <label class="type-switch-label">
+            <input type="radio" name="debt-type" value="to_pay" checked id="switch-debt-to-pay">
+            <span class="type-switch-btn expense">Debo a alguien</span>
+          </label>
+          <label class="type-switch-label">
+            <input type="radio" name="debt-type" value="to_collect" id="switch-debt-to-collect">
+            <span class="type-switch-btn income">Me deben dinero</span>
+          </label>
+        </div>
+
+        <!-- Person Input -->
+        <div class="form-group">
+          <label for="debt-person">Contacto / Persona</label>
+          <input type="text" id="debt-person" name="person" placeholder="Ej. Banco Santander, Sofía Pérez..." required>
+        </div>
+
+        <!-- Amount Input -->
+        <div class="form-group">
+          <label for="debt-amount">Monto (<span class="currency-symbol">$</span>)</label>
+          <div class="amount-input-wrapper">
+            <span class="currency-prefix-addon currency-symbol">$</span>
+            <input type="number" id="debt-amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required>
+          </div>
+        </div>
+
+        <!-- Due Date Input -->
+        <div class="form-group">
+          <label for="debt-due-date">Fecha Límite (Opcional)</label>
+          <input type="date" id="debt-due-date" name="dueDate">
+        </div>
+
+        <!-- Note Input -->
+        <div class="form-group">
+          <label for="debt-note">Nota / Detalle</label>
+          <input type="text" id="debt-note" name="note" placeholder="Ej. Préstamo para laptop, Pago tarjeta...">
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-debt" class="btn btn-text">Cancelar</button>
+          <button type="submit" id="btn-save-debt" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD DEBT PAYMENT -->
+  <div id="debt-payment-modal" class="modal-overlay" aria-hidden="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="debt-payment-modal-title">Registrar Abono</h3>
+        <button id="btn-close-debt-payment-modal" class="close-btn" aria-label="Cerrar modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="debt-payment-form" class="modal-body">
+        <input type="hidden" id="payment-debt-id" value="">
+        
+        <!-- Target Info Quick Glance -->
+        <div id="payment-debt-info" style="margin-bottom: 20px; padding: 12px 16px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center;">
+          <!-- Dynamically filled with debt target details -->
+        </div>
+
+        <!-- Amount Input -->
+        <div class="form-group">
+          <label for="payment-amount">Monto del Abono (<span class="currency-symbol">$</span>)</label>
+          <div class="amount-input-wrapper">
+            <span class="currency-prefix-addon currency-symbol">$</span>
+            <input type="number" id="payment-amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required autofocus>
+          </div>
+        </div>
+
+        <!-- Date Input -->
+        <div class="form-group">
+          <label for="payment-date">Fecha del Abono</label>
+          <input type="date" id="payment-date" name="date" required>
+        </div>
+
+        <!-- Log Transaction Option Checkbox -->
+        <div class="form-group" style="margin-top: 10px;">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="payment-log-transaction" checked>
+            <label for="payment-log-transaction">Registrar automáticamente este abono en mi historial de transacciones.</label>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-debt-payment" class="btn btn-text">Cancelar</button>
+          <button type="submit" id="btn-save-debt-payment" class="btn btn-primary">Registrar Pago</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Lucide Icons CDN -->
+  <script>
+    // Initial dummy to keep icon scripts working before loading main JS
+    window.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    });
+  </script>
+  <!-- Main JS Application script loaded as ES Module -->
+  <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>
