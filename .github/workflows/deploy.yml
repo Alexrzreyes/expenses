@@ -1,0 +1,56 @@
+# Workflow para compilar y desplegar GastosFlow en GitHub Pages
+name: Desplegar en GitHub Pages
+
+on:
+  # Se ejecuta al empujar cambios en la rama predeterminada
+  push:
+    branches: ["main", "master"]
+
+  # Permite ejecutar este flujo de trabajo manualmente desde la pestaña Actions en GitHub
+  workflow_dispatch:
+
+# Otorga permisos del GITHUB_TOKEN para permitir el despliegue en Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Permite solo un despliegue concurrente para evitar colisiones
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci || npm install
+
+      - name: Compilar proyecto
+        run: npm run build
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir artefacto de compilación
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Sube los archivos compilados por Vite en la carpeta dist
+          path: './dist'
+
+      - name: Desplegar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
