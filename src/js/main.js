@@ -132,6 +132,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Register state subscriber to trigger UI redraws
   state.subscribe(onStateChange);
+
+  // Register PWA Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('PWA Service Worker registrado:', reg.scope))
+        .catch(err => console.error('Error PWA:', err));
+    });
+  }
 });
 
 /**
