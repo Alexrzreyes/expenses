@@ -833,11 +833,11 @@ body {
 }
 
 .icon-btn {
-  background: transparent;
+  background: var(--input-bg);
   border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  width: 40px;
-  height: 40px;
+  color: var(--text-primary);
+  width: 44px;
+  height: 44px;
   border-radius: var(--border-radius-md);
   display: flex;
   align-items: center;
@@ -846,16 +846,21 @@ body {
   transition: all var(--transition-fast);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+.light-theme .icon-btn {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 .icon-btn:hover {
-  background-color: var(--input-bg);
-  border-color: var(--border-color-hover);
-  color: var(--text-primary);
-  transform: translateY(-1px);
+  background-color: var(--border-color);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.2);
 }
 .icon-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   transition: transform var(--transition-normal);
 }
 

@@ -1,6 +1,102 @@
 import * as state from './state.js';
 import * as ui from './ui.js';
 import { updateCharts } from './charts.js';
+import { 
+  createIcons, 
+  TrendingUp, 
+  Sun, 
+  Moon, 
+  Settings, 
+  Receipt, 
+  Plus, 
+  Search, 
+  Edit3, 
+  Trash2, 
+  X, 
+  PiggyBank, 
+  Tags, 
+  Sliders, 
+  Database, 
+  Download, 
+  FileSpreadsheet, 
+  Upload,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Landmark,
+  Coffee,
+  Car,
+  Home,
+  Clapperboard,
+  Dumbbell,
+  BookOpen,
+  Wrench,
+  Tag,
+  ShoppingBag,
+  Gift,
+  Wifi,
+  Plane,
+  Info,
+  PieChart,
+  BarChart3,
+  CheckCircle,
+  AlertTriangle,
+  Bell
+} from 'lucide';
+
+// Expose createIcons globally to keep other modules compatible
+window.lucide = {
+  createIcons: (options = {}) => {
+    const targetNode = options.node || document.body;
+    createIcons({
+      nameAttr: 'data-lucide',
+      attrs: {
+        class: 'lucide-icon'
+      },
+      icons: {
+        TrendingUp,
+        Sun,
+        Moon,
+        Settings,
+        Receipt,
+        Plus,
+        Search,
+        Edit3,
+        Trash2,
+        X,
+        PiggyBank,
+        Tags,
+        Sliders,
+        Database,
+        Download,
+        FileSpreadsheet,
+        Upload,
+        ArrowDownLeft,
+        ArrowUpRight,
+        Landmark,
+        Coffee,
+        Car,
+        Home,
+        Clapperboard,
+        Dumbbell,
+        BookOpen,
+        Wrench,
+        Tag,
+        ShoppingBag,
+        Gift,
+        Wifi,
+        Plane,
+        Info,
+        PieChart,
+        BarChart3,
+        CheckCircle,
+        AlertTriangle,
+        Bell
+      },
+      ...options,
+      node: targetNode
+    });
+  }
+};
 
 // DOM Selectors
 let modalTransaction, modalSettings, modalDebt, modalDebtPayment;
@@ -28,6 +124,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Bind Event Listeners
   bindEvents();
+
+  // Initialize static Lucide icons (Header, Logo, etc.)
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
 
   // Register state subscriber to trigger UI redraws
   state.subscribe(onStateChange);

@@ -671,15 +671,7 @@
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- Lucide Icons CDN -->
-  <script>
-    // Initial dummy to keep icon scripts working before loading main JS
-    window.addEventListener('DOMContentLoaded', () => {
-      if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-      }
-    });
-  </script>
+  <!-- Lucide icons are bundled locally via npm package -->
   <!-- Main JS Application script loaded as ES Module -->
   <script type="module" src="./src/js/main.js"></script>
 </body>
