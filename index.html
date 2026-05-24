@@ -1,48 +1,53 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GastosFlow - Control de Gastos e Ingresos Inteligente</title>
-  <meta name="description" content="Lleva el control de tus finanzas personales con GastosFlow. Dashboard interactivo, presupuestos mensuales, categorías personalizadas y estadísticas detalladas.">
-  
+  <title>Gastos by Alexis - Control de Gastos e Ingresos Inteligente</title>
+  <meta name="description"
+    content="Lleva el control de tus finanzas personales con Gastos. Dashboard interactivo, presupuestos mensuales, categorías personalizadas y estadísticas detalladas.">
+
   <!-- Google Fonts: Outfit & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="./src/css/style.css">
-  
+
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body class="dark-theme">
   <!-- Layout Wrapper -->
   <div class="app-container">
-    
+
     <!-- Top Header -->
     <header class="app-header">
       <div class="logo-area">
         <div class="logo-icon-wrapper">
           <i data-lucide="trending-up" class="logo-icon"></i>
         </div>
-        <h1 id="app-title">GastosFlow</h1>
+        <h1 id="app-title">Gastos by Alexis</h1>
       </div>
-      
+
       <div class="header-actions">
         <!-- Budget Progress indicator quick glance -->
         <div id="quick-budget-badge" class="quick-budget-badge hidden">
           <i data-lucide="piggy-bank"></i>
           <span id="quick-budget-text">Presupuesto: --</span>
         </div>
-        
+
         <!-- Theme Toggle -->
         <button id="theme-toggle-btn" class="icon-btn" aria-label="Cambiar tema">
           <i data-lucide="sun" class="sun-icon"></i>
           <i data-lucide="moon" class="moon-icon"></i>
         </button>
-        
+
         <!-- Settings Trigger -->
         <button id="settings-toggle-btn" class="icon-btn" aria-label="Configuración">
           <i data-lucide="settings"></i>
@@ -52,7 +57,7 @@
 
     <!-- Main Content Grid -->
     <main class="app-main">
-      
+
       <!-- Top Navigation Tabs -->
       <nav class="app-navigation-tabs" aria-label="Navegación principal">
         <button class="nav-tab-btn active" data-target="view-dashboard">
@@ -70,7 +75,7 @@
         <!-- 1. Stats Dashboard -->
         <section class="dashboard-grid" aria-labelledby="dashboard-heading">
           <h2 id="dashboard-heading" class="sr-only">Resumen Financiero</h2>
-          
+
           <!-- Balance Card -->
           <div class="stat-card balance-card">
             <div class="card-glow"></div>
@@ -83,7 +88,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Income Card -->
           <div class="stat-card income-card">
             <div class="card-content">
@@ -97,7 +102,7 @@
               <span class="card-subtext" id="income-count">0 transacciones</span>
             </div>
           </div>
-          
+
           <!-- Expenses Card -->
           <div class="stat-card expense-card">
             <div class="card-content">
@@ -176,7 +181,8 @@
             <!-- Search input -->
             <div class="search-input-wrapper">
               <i data-lucide="search" class="search-icon"></i>
-              <input type="text" id="search-filter" placeholder="Buscar por nota o descripción..." aria-label="Buscar transacciones">
+              <input type="text" id="search-filter" placeholder="Buscar por nota o descripción..."
+                aria-label="Buscar transacciones">
             </div>
 
             <!-- Select filters -->
@@ -233,7 +239,7 @@
         <!-- Summary Cards -->
         <section class="dashboard-grid" aria-labelledby="debts-summary-heading">
           <h2 id="debts-summary-heading" class="sr-only">Resumen de Deudas</h2>
-          
+
           <!-- Owed to Others Card -->
           <div class="stat-card expense-card">
             <div class="card-content">
@@ -265,7 +271,8 @@
           <!-- Quick Debt Action Card -->
           <div class="stat-card balance-card">
             <div class="card-glow"></div>
-            <div class="card-content" style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+            <div class="card-content"
+              style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
               <span class="card-label" style="margin-bottom: 12px;">Gestión de Préstamos</span>
               <button id="btn-open-debt-modal" class="btn btn-primary" style="width: 100%;">
                 <i data-lucide="plus"></i>
@@ -280,14 +287,15 @@
           <div class="section-title-bar">
             <h3>Tus Cuentas Pendientes</h3>
           </div>
-          
+
           <!-- Debts Container -->
           <div id="debts-empty-state" class="empty-state">
             <div class="empty-illustration">
               <i data-lucide="landmark" class="empty-icon"></i>
             </div>
             <h4>No tienes deudas registradas</h4>
-            <p>Registra dinero que debas a terceros o préstamos que hayas hecho para realizar un seguimiento de los abonos.</p>
+            <p>Registra dinero que debas a terceros o préstamos que hayas hecho para realizar un seguimiento de los
+              abonos.</p>
           </div>
 
           <div id="debts-list" class="debts-list hidden">
@@ -300,7 +308,7 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <p>&copy; 2026 GastosFlow. Creado con amor por el equipo de diseño y código.</p>
+      <p>&copy; 2026 Gastos. Creado con amor por Alexis Rodríguez.</p>
     </footer>
   </div>
 
@@ -315,7 +323,7 @@
       </div>
       <form id="transaction-form" class="modal-body">
         <input type="hidden" id="edit-transaction-id" value="">
-        
+
         <!-- Transaction Type Switcher -->
         <div class="type-switcher-container">
           <label class="type-switch-label">
@@ -333,7 +341,8 @@
           <label for="tx-amount">Monto (<span class="currency-symbol">$</span>)</label>
           <div class="amount-input-wrapper">
             <span class="currency-prefix-addon currency-symbol">$</span>
-            <input type="number" id="tx-amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required autofocus>
+            <input type="number" id="tx-amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required
+              autofocus>
           </div>
         </div>
 
@@ -378,7 +387,7 @@
         </button>
       </div>
       <div class="modal-body settings-layout">
-        
+
         <!-- Left Pane: Sections Menu -->
         <aside class="settings-sidebar">
           <button class="settings-tab-btn active" data-tab="tab-budget">
@@ -401,14 +410,16 @@
 
         <!-- Right Pane: Active Panels -->
         <div class="settings-content">
-          
+
           <!-- TAB 1: Budget Settings -->
           <div class="settings-panel active" id="tab-budget">
             <h4>Límites de Presupuesto</h4>
-            <p class="panel-desc">Establece límites para controlar tus egresos mensuales. Te avisaremos cuando estés cerca de superarlos.</p>
-            
+            <p class="panel-desc">Establece límites para controlar tus egresos mensuales. Te avisaremos cuando estés
+              cerca de superarlos.</p>
+
             <div class="settings-form-group">
-              <label for="setting-global-budget">Presupuesto Mensual Global (<span class="currency-symbol">$</span>)</label>
+              <label for="setting-global-budget">Presupuesto Mensual Global (<span
+                  class="currency-symbol">$</span>)</label>
               <div class="inline-input-row">
                 <input type="number" id="setting-global-budget" placeholder="Sin límite" min="0" step="10">
                 <button id="btn-save-global-budget" class="btn btn-secondary">Establecer</button>
@@ -434,36 +445,56 @@
                 <label for="new-cat-name">Nombre de Categoría</label>
                 <input type="text" id="new-cat-name" placeholder="Ej. Regalos, Gimnasio..." required>
               </div>
-              
+
               <div class="form-group">
                 <label>Color</label>
                 <div class="color-presets">
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#ef4444" checked><span style="background-color: #ef4444"></span></label>
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#f97316"><span style="background-color: #f97316"></span></label>
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#eab308"><span style="background-color: #eab308"></span></label>
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#22c55e"><span style="background-color: #22c55e"></span></label>
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#06b6d4"><span style="background-color: #06b6d4"></span></label>
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#3b82f6"><span style="background-color: #3b82f6"></span></label>
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#6366f1"><span style="background-color: #6366f1"></span></label>
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#a855f7"><span style="background-color: #a855f7"></span></label>
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#ec4899"><span style="background-color: #ec4899"></span></label>
-                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#64748b"><span style="background-color: #64748b"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#ef4444" checked><span
+                      style="background-color: #ef4444"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#f97316"><span
+                      style="background-color: #f97316"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#eab308"><span
+                      style="background-color: #eab308"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#22c55e"><span
+                      style="background-color: #22c55e"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#06b6d4"><span
+                      style="background-color: #06b6d4"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#3b82f6"><span
+                      style="background-color: #3b82f6"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#6366f1"><span
+                      style="background-color: #6366f1"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#a855f7"><span
+                      style="background-color: #a855f7"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#ec4899"><span
+                      style="background-color: #ec4899"></span></label>
+                  <label class="color-preset-opt"><input type="radio" name="cat-color" value="#64748b"><span
+                      style="background-color: #64748b"></span></label>
                 </div>
               </div>
 
               <div class="form-group">
                 <label>Icono</label>
                 <div class="icon-presets">
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="tag" checked><i data-lucide="tag"></i></label>
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="shopping-bag"><i data-lucide="shopping-bag"></i></label>
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="coffee"><i data-lucide="coffee"></i></label>
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="clapperboard"><i data-lucide="clapperboard"></i></label>
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="dumbbell"><i data-lucide="dumbbell"></i></label>
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="plane"><i data-lucide="plane"></i></label>
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="gift"><i data-lucide="gift"></i></label>
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="wifi"><i data-lucide="wifi"></i></label>
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="car"><i data-lucide="car"></i></label>
-                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="wrench"><i data-lucide="wrench"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="tag" checked><i
+                      data-lucide="tag"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="shopping-bag"><i
+                      data-lucide="shopping-bag"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="coffee"><i
+                      data-lucide="coffee"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="clapperboard"><i
+                      data-lucide="clapperboard"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="dumbbell"><i
+                      data-lucide="dumbbell"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="plane"><i
+                      data-lucide="plane"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="gift"><i
+                      data-lucide="gift"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="wifi"><i
+                      data-lucide="wifi"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="car"><i
+                      data-lucide="car"></i></label>
+                  <label class="icon-preset-opt"><input type="radio" name="cat-icon" value="wrench"><i
+                      data-lucide="wrench"></i></label>
                 </div>
               </div>
 
@@ -498,12 +529,13 @@
               </div>
               <small class="form-hint">Todos los montos y gráficos usarán esta moneda.</small>
             </div>
-            
+
             <div class="settings-form-group">
               <label for="setting-visual-alerts">Alertas de Presupuesto</label>
               <div class="checkbox-wrapper">
                 <input type="checkbox" id="setting-visual-alerts" checked>
-                <label for="setting-visual-alerts">Mostrar notificaciones visuales en la app al exceder el 80% del presupuesto.</label>
+                <label for="setting-visual-alerts">Mostrar notificaciones visuales en la app al exceder el 80% del
+                  presupuesto.</label>
               </div>
             </div>
           </div>
@@ -511,7 +543,8 @@
           <!-- TAB 4: Data & Backup -->
           <div class="settings-panel" id="tab-data">
             <h4>Datos y Copias de Seguridad</h4>
-            <p class="panel-desc">Exporta o importa tus datos locales para transferirlos a otro dispositivo o mantenerlos a salvo.</p>
+            <p class="panel-desc">Exporta o importa tus datos locales para transferirlos a otro dispositivo o
+              mantenerlos a salvo.</p>
 
             <div class="data-actions-grid">
               <div class="data-action-card">
@@ -534,7 +567,8 @@
 
               <div class="data-action-card">
                 <h5>Importar Copia (JSON)</h5>
-                <p>Restaura tus datos desde un archivo JSON previamente exportado. <strong class="text-danger">¡Esto sobrescribirá los datos actuales!</strong></p>
+                <p>Restaura tus datos desde un archivo JSON previamente exportado. <strong class="text-danger">¡Esto
+                    sobrescribirá los datos actuales!</strong></p>
                 <label for="import-file-input" class="btn btn-outline-danger btn-file-label">
                   <i data-lucide="upload"></i>
                   <span>Seleccionar Archivo</span>
@@ -570,7 +604,7 @@
       </div>
       <form id="debt-form" class="modal-body">
         <input type="hidden" id="edit-debt-id" value="">
-        
+
         <!-- Debt Type Switcher -->
         <div class="type-switcher-container">
           <label class="type-switch-label">
@@ -630,9 +664,10 @@
       </div>
       <form id="debt-payment-form" class="modal-body">
         <input type="hidden" id="payment-debt-id" value="">
-        
+
         <!-- Target Info Quick Glance -->
-        <div id="payment-debt-info" style="margin-bottom: 20px; padding: 12px 16px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center;">
+        <div id="payment-debt-info"
+          style="margin-bottom: 20px; padding: 12px 16px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center;">
           <!-- Dynamically filled with debt target details -->
         </div>
 
@@ -641,7 +676,8 @@
           <label for="payment-amount">Monto del Abono (<span class="currency-symbol">$</span>)</label>
           <div class="amount-input-wrapper">
             <span class="currency-prefix-addon currency-symbol">$</span>
-            <input type="number" id="payment-amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required autofocus>
+            <input type="number" id="payment-amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required
+              autofocus>
           </div>
         </div>
 
@@ -655,7 +691,8 @@
         <div class="form-group" style="margin-top: 10px;">
           <div class="checkbox-wrapper">
             <input type="checkbox" id="payment-log-transaction" checked>
-            <label for="payment-log-transaction">Registrar automáticamente este abono en mi historial de transacciones.</label>
+            <label for="payment-log-transaction">Registrar automáticamente este abono en mi historial de
+              transacciones.</label>
           </div>
         </div>
 
@@ -675,4 +712,5 @@
   <!-- Main JS Application script loaded as ES Module -->
   <script type="module" src="./src/js/main.js"></script>
 </body>
+
 </html>
