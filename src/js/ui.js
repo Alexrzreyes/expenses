@@ -468,7 +468,7 @@ function escapeHtml(str) {
 /**
  * Render Debts section summary and listing
  */
-export function renderDebts(state, onAddPayment, onDelete) {
+export function renderDebts(state, onAddPayment, onAddIncrease, onDelete) {
   const debtsListEl = document.getElementById('debts-list');
   const emptyStateEl = document.getElementById('debts-empty-state');
   const currency = state.settings.currency;
@@ -551,6 +551,9 @@ export function renderDebts(state, onAddPayment, onDelete) {
     const paidAmount = d.amount - d.remainingAmount;
     const progressPercent = Math.min(100, Math.round((paidAmount / d.amount) * 100)) || 0;
 
+    const hasIncreases = d.originalAmount !== undefined && d.amount !== d.originalAmount;
+    const originalText = hasIncreases ? `<span class="debt-amount-subtext" style="font-size: 11px; color: var(--text-muted); display: block;">Original: ${formatCurrency(d.originalAmount, currency)}</span>` : '';
+
     card.innerHTML = `
       <div class="debt-card-header">
         <div class="debt-card-title">
@@ -564,8 +567,9 @@ export function renderDebts(state, onAddPayment, onDelete) {
 
       <div class="debt-card-amounts">
         <div class="debt-amount-col">
-          <span class="debt-amount-label">Monto Original</span>
+          <span class="debt-amount-label">Monto Total</span>
           <span class="debt-amount-val">${formatCurrency(d.amount, currency)}</span>
+          ${originalText}
         </div>
         <div class="debt-amount-col text-right">
           <span class="debt-amount-label">Pendiente</span>
@@ -589,7 +593,10 @@ export function renderDebts(state, onAddPayment, onDelete) {
 
       <div class="debt-card-actions">
         <button class="btn btn-danger delete" title="Eliminar deuda">Eliminar</button>
-        ${d.status !== 'paid' ? `<button class="btn btn-primary add-payment">Abonar</button>` : ''}
+        ${d.status !== 'paid' ? `
+          <button class="btn btn-secondary increase-debt" title="Incrementar deuda">Incrementar</button>
+          <button class="btn btn-primary add-payment">Abonar</button>
+        ` : ''}
       </div>
     `;
 
@@ -601,6 +608,9 @@ export function renderDebts(state, onAddPayment, onDelete) {
     if (d.status !== 'paid') {
       card.querySelector('.add-payment').addEventListener('click', () => {
         onAddPayment(d);
+      });
+      card.querySelector('.increase-debt').addEventListener('click', () => {
+        onAddIncrease(d);
       });
     }
 

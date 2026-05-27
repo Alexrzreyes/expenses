@@ -1,6 +1,6 @@
 import * as state from './state.js';
 import * as ui from './ui.js';
-import { updateCharts } from './charts.js';
+import { updateCharts, updateDebtsCharts } from './charts.js';
 import { 
   createIcons, 
   TrendingUp, 
@@ -99,8 +99,8 @@ window.lucide = {
 };
 
 // DOM Selectors
-let modalTransaction, modalSettings, modalDebt, modalDebtPayment;
-let formTransaction, formCategory, formDebt, formDebtPayment;
+let modalTransaction, modalSettings, modalDebt, modalDebtPayment, modalDebtIncrease;
+let formTransaction, formCategory, formDebt, formDebtPayment, formDebtIncrease;
 let searchFilter, typeFilter, categoryFilter, timeFilter;
 
 // Filter State
@@ -151,11 +151,13 @@ function initDomElements() {
   modalSettings = document.getElementById('settings-modal');
   modalDebt = document.getElementById('debt-modal');
   modalDebtPayment = document.getElementById('debt-payment-modal');
+  modalDebtIncrease = document.getElementById('debt-increase-modal');
   
   formTransaction = document.getElementById('transaction-form');
   formCategory = document.getElementById('new-category-form');
   formDebt = document.getElementById('debt-form');
   formDebtPayment = document.getElementById('debt-payment-form');
+  formDebtIncrease = document.getElementById('debt-increase-form');
   
   searchFilter = document.getElementById('search-filter');
   typeFilter = document.getElementById('type-filter');
@@ -185,6 +187,9 @@ function bindEvents() {
         const activeState = state.getState();
         const filtered = getFilteredTransactions(activeState.transactions);
         updateCharts(activeState, filtered);
+      } else if (targetView === 'view-debts') {
+        const activeState = state.getState();
+        updateDebtsCharts(activeState);
       }
     });
   });
@@ -207,12 +212,17 @@ function bindEvents() {
   document.getElementById('btn-close-debt-payment-modal').addEventListener('click', () => ui.closeModal(modalDebtPayment));
   document.getElementById('btn-cancel-debt-payment').addEventListener('click', () => ui.closeModal(modalDebtPayment));
 
+  // Debt Increase modal toggle events
+  document.getElementById('btn-close-debt-increase-modal').addEventListener('click', () => ui.closeModal(modalDebtIncrease));
+  document.getElementById('btn-cancel-debt-increase').addEventListener('click', () => ui.closeModal(modalDebtIncrease));
+
   // Close modals clicking outside card content
   window.addEventListener('click', (e) => {
     if (e.target === modalTransaction) ui.closeModal(modalTransaction);
     if (e.target === modalSettings) ui.closeModal(modalSettings);
     if (e.target === modalDebt) ui.closeModal(modalDebt);
     if (e.target === modalDebtPayment) ui.closeModal(modalDebtPayment);
+    if (e.target === modalDebtIncrease) ui.closeModal(modalDebtIncrease);
   });
 
   // --- Filters ---
@@ -259,6 +269,12 @@ function bindEvents() {
   formDebtPayment.addEventListener('submit', (e) => {
     e.preventDefault();
     handleDebtPaymentSubmit();
+  });
+
+  // Save Debt Increase Form
+  formDebtIncrease.addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleDebtIncreaseSubmit();
   });
 
   // --- Setting Actions ---
@@ -454,10 +470,11 @@ function onStateChange(activeState) {
   ui.renderActiveCategories(activeState, handleDeleteCategory);
 
   // Render debts panel
-  ui.renderDebts(activeState, handleOpenAddPayment, handleDeleteDebt);
+  ui.renderDebts(activeState, handleOpenAddPayment, handleOpenAddIncrease, handleDeleteDebt);
 
   // Dynamic visual charts redraw
   updateCharts(activeState, filtered);
+  updateDebtsCharts(activeState);
 }
 
 /**
@@ -572,6 +589,7 @@ function openDebtModal() {
   formDebt.reset();
   document.getElementById('edit-debt-id').value = '';
   document.getElementById('debt-modal-title').textContent = 'Nueva Deuda / Préstamo';
+  document.getElementById('debt-date').value = new Date().toISOString().split('T')[0];
   ui.openModal(modalDebt);
 }
 
@@ -579,10 +597,11 @@ function handleDebtSubmit() {
   const type = formDebt.querySelector('input[name="debt-type"]:checked').value;
   const person = document.getElementById('debt-person').value;
   const amount = document.getElementById('debt-amount').value;
+  const date = document.getElementById('debt-date').value;
   const dueDate = document.getElementById('debt-due-date').value;
   const note = document.getElementById('debt-note').value;
 
-  const data = { type, person, amount, dueDate, note };
+  const data = { type, person, amount, date, dueDate, note };
 
   state.addDebt(data);
   ui.showToast('Deuda guardada correctamente.', 'success');
@@ -623,6 +642,34 @@ function handleDebtPaymentSubmit() {
   state.addDebtPayment(debtId, { amount, date, logTransaction });
   ui.showToast('Abono registrado correctamente.', 'success');
   ui.closeModal(modalDebtPayment);
+}
+
+function handleOpenAddIncrease(debt) {
+  formDebtIncrease.reset();
+  
+  document.getElementById('increase-debt-id').value = debt.id;
+  document.getElementById('increase-amount').value = '';
+  document.getElementById('increase-date').value = new Date().toISOString().split('T')[0];
+  
+  const textInfo = debt.type === 'to_pay' ? 'Deuda con' : 'Préstamo a';
+  const currency = state.getState().settings.currency;
+  document.getElementById('increase-debt-info').innerHTML = `
+    <span><strong>${textInfo}:</strong> ${debt.person}</span>
+    <span><strong>Monto Actual:</strong> ${ui.formatCurrency(debt.amount, currency)}</span>
+  `;
+
+  ui.openModal(modalDebtIncrease);
+}
+
+function handleDebtIncreaseSubmit() {
+  const debtId = document.getElementById('increase-debt-id').value;
+  const amount = document.getElementById('increase-amount').value;
+  const date = document.getElementById('increase-date').value;
+  const logTransaction = document.getElementById('increase-log-transaction').checked;
+
+  state.addDebtIncrease(debtId, { amount, date, logTransaction });
+  ui.showToast('Incremento registrado correctamente.', 'success');
+  ui.closeModal(modalDebtIncrease);
 }
 
 /* ==========================================================================

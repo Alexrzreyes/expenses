@@ -65,7 +65,24 @@ export function loadState() {
         categories: parsed.categories || DEFAULT_CATEGORIES,
         budgets: parsed.budgets || { global: 0, categories: {} },
         settings: { ...INITIAL_STATE.settings, ...(parsed.settings || {}) },
-        debts: parsed.debts || []
+        debts: (parsed.debts || []).map(d => {
+          let dDate = d.date;
+          if (!dDate) {
+            const timestamp = parseInt(d.id.split('_')[1]);
+            if (!isNaN(timestamp)) {
+              dDate = new Date(timestamp).toISOString().split('T')[0];
+            } else {
+              dDate = new Date().toISOString().split('T')[0];
+            }
+          }
+          return {
+            ...d,
+            originalAmount: d.originalAmount !== undefined ? d.originalAmount : d.amount,
+            date: dDate,
+            increases: d.increases || [],
+            payments: d.payments || []
+          };
+        })
       };
     } else {
       state = { ...INITIAL_STATE };
@@ -219,22 +236,80 @@ export function updateSettings(newSettings) {
    DEBTS MANAGEMENT
    ========================================================================== */
 
-export function addDebt({ type, person, amount, dueDate, note }) {
+export function addDebt({ type, person, amount, date, dueDate, note }) {
+  const parsedAmount = parseFloat(amount);
   const newDebt = {
     id: `debt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     type, // 'to_pay' (Debo a...) | 'to_collect' (Me deben...)
     person: person.trim(),
-    amount: parseFloat(amount),
-    remainingAmount: parseFloat(amount),
+    amount: parsedAmount,
+    originalAmount: parsedAmount,
+    remainingAmount: parsedAmount,
+    date: date || new Date().toISOString().split('T')[0],
     dueDate: dueDate || '',
     note: note.trim(),
     status: 'active', // 'active' | 'paid'
-    payments: []
+    payments: [],
+    increases: []
   };
 
   state.debts.unshift(newDebt);
   saveState();
   return newDebt;
+}
+
+export function addDebtIncrease(debtId, { amount, date, logTransaction }) {
+  const debt = state.debts.find(d => d.id === debtId);
+  if (!debt) return null;
+
+  const increaseAmount = parseFloat(amount);
+  const increase = {
+    id: `inc_${Date.now()}`,
+    amount: increaseAmount,
+    date
+  };
+
+  if (!debt.increases) {
+    debt.increases = [];
+  }
+  debt.increases.push(increase);
+
+  // Initialize originalAmount if not present
+  if (debt.originalAmount === undefined) {
+    const totalPreviousIncreases = debt.increases.slice(0, -1).reduce((sum, inc) => sum + inc.amount, 0);
+    debt.originalAmount = debt.amount - totalPreviousIncreases;
+  }
+
+  // Recalculate amounts
+  const totalIncreased = debt.increases.reduce((sum, inc) => sum + inc.amount, 0);
+  const totalPaid = (debt.payments || []).reduce((sum, p) => sum + p.amount, 0);
+
+  debt.amount = debt.originalAmount + totalIncreased;
+  debt.remainingAmount = Math.max(0, debt.amount - totalPaid);
+
+  if (debt.remainingAmount > 0) {
+    debt.status = 'active';
+  }
+
+  // Optionally register transaction
+  if (logTransaction) {
+    const txType = debt.type === 'to_pay' ? 'income' : 'expense';
+    const txNote = debt.type === 'to_pay'
+      ? `Incremento de deuda: ${debt.person}`
+      : `Incremento de préstamo: ${debt.person}`;
+
+    addTransaction({
+      amount: increaseAmount,
+      type: txType,
+      category: 'otros',
+      date,
+      note: txNote
+    });
+  } else {
+    saveState();
+  }
+
+  return debt;
 }
 
 export function deleteDebt(id) {

@@ -290,6 +290,39 @@
           </div>
         </section>
 
+        <!-- Debts Charts Section -->
+        <section class="charts-and-budgets-grid" style="margin-top: 24px;">
+          <!-- Chart Container: Debts History -->
+          <div class="card chart-card">
+            <div class="chart-header">
+              <h3>Evolución de Deudas</h3>
+              <span class="chart-subtitle">Historial de saldo pendiente (Últimos 30 días)</span>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="debts-history-chart"></canvas>
+              <div id="no-debts-chart-data" class="no-data-overlay">
+                <i data-lucide="landmark" class="no-data-icon"></i>
+                <p>Registra deudas o préstamos activos para visualizar la tendencia</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Container: Debts Balance -->
+          <div class="card chart-card">
+            <div class="chart-header">
+              <h3>Balance de Cuentas</h3>
+              <span class="chart-subtitle">Deudas (Por Pagar) vs. Préstamos (Por Cobrar)</span>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="debts-balance-chart"></canvas>
+              <div id="no-debts-balance-data" class="no-data-overlay">
+                <i data-lucide="pie-chart" class="no-data-icon"></i>
+                <p>Sin saldos pendientes para mostrar el balance</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Active and Settled Debts Listing -->
         <section class="transactions-section card" style="margin-top: 30px;">
           <div class="section-title-bar">
@@ -640,6 +673,12 @@
           </div>
         </div>
 
+        <!-- Registration Date Input -->
+        <div class="form-group">
+          <label for="debt-date">Fecha de Registro</label>
+          <input type="date" id="debt-date" name="date" required>
+        </div>
+
         <!-- Due Date Input -->
         <div class="form-group">
           <label for="debt-due-date">Fecha Límite (Opcional)</label>
@@ -708,6 +747,58 @@
         <div class="modal-actions">
           <button type="button" id="btn-cancel-debt-payment" class="btn btn-text">Cancelar</button>
           <button type="submit" id="btn-save-debt-payment" class="btn btn-primary">Registrar Pago</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD DEBT INCREASE -->
+  <div id="debt-increase-modal" class="modal-overlay" aria-hidden="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="debt-increase-modal-title">Incrementar Deuda / Préstamo</h3>
+        <button id="btn-close-debt-increase-modal" class="close-btn" aria-label="Cerrar modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="debt-increase-form" class="modal-body">
+        <input type="hidden" id="increase-debt-id" value="">
+
+        <!-- Target Info Quick Glance -->
+        <div id="increase-debt-info"
+          style="margin-bottom: 20px; padding: 12px 16px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center;">
+          <!-- Dynamically filled with debt target details -->
+        </div>
+
+        <!-- Amount Input -->
+        <div class="form-group">
+          <label for="increase-amount">Monto del Incremento (<span class="currency-symbol">$</span>)</label>
+          <div class="amount-input-wrapper">
+            <span class="currency-prefix-addon currency-symbol">$</span>
+            <input type="number" id="increase-amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required
+              autofocus>
+          </div>
+        </div>
+
+        <!-- Date Input -->
+        <div class="form-group">
+          <label for="increase-date">Fecha del Incremento</label>
+          <input type="date" id="increase-date" name="date" required>
+        </div>
+
+        <!-- Log Transaction Option Checkbox -->
+        <div class="form-group" style="margin-top: 10px;">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="increase-log-transaction" checked>
+            <label for="increase-log-transaction">Registrar automáticamente este incremento en mi historial de
+              transacciones.</label>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-debt-increase" class="btn btn-text">Cancelar</button>
+          <button type="submit" id="btn-save-debt-increase" class="btn btn-primary">Registrar Incremento</button>
         </div>
       </form>
     </div>
