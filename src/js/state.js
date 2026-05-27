@@ -322,6 +322,21 @@ export function deleteDebt(id) {
   return false;
 }
 
+export function reorderDebt(id, direction) {
+  const index = state.debts.findIndex(d => d.id === id);
+  if (index === -1) return false;
+
+  const targetIndex = direction === 'up' ? index - 1 : index + 1;
+  if (targetIndex < 0 || targetIndex >= state.debts.length) return false;
+
+  const temp = state.debts[index];
+  state.debts[index] = state.debts[targetIndex];
+  state.debts[targetIndex] = temp;
+
+  saveState();
+  return true;
+}
+
 export function addDebtPayment(debtId, { amount, date, logTransaction }) {
   const debt = state.debts.find(d => d.id === debtId);
   if (!debt) return null;

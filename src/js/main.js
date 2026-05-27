@@ -40,7 +40,9 @@ import {
   BarChart3,
   CheckCircle,
   AlertTriangle,
-  Bell
+  Bell,
+  ChevronUp,
+  ChevronDown
 } from 'lucide';
 
 // Expose createIcons globally to keep other modules compatible
@@ -90,7 +92,9 @@ window.lucide = {
         BarChart3,
         CheckCircle,
         AlertTriangle,
-        Bell
+        Bell,
+        ChevronUp,
+        ChevronDown
       },
       ...options,
       node: targetNode
@@ -470,7 +474,7 @@ function onStateChange(activeState) {
   ui.renderActiveCategories(activeState, handleDeleteCategory);
 
   // Render debts panel
-  ui.renderDebts(activeState, handleOpenAddPayment, handleOpenAddIncrease, handleDeleteDebt);
+  ui.renderDebts(activeState, handleOpenAddPayment, handleOpenAddIncrease, handleDeleteDebt, handleReorderDebt);
 
   // Dynamic visual charts redraw
   updateCharts(activeState, filtered);
@@ -614,6 +618,10 @@ function handleDeleteDebt(id) {
     state.deleteDebt(id);
     ui.showToast('Deuda eliminada.', 'success');
   }
+}
+
+function handleReorderDebt(id, direction) {
+  state.reorderDebt(id, direction);
 }
 
 function handleOpenAddPayment(debt) {

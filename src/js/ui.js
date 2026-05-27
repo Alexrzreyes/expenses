@@ -468,7 +468,7 @@ function escapeHtml(str) {
 /**
  * Render Debts section summary and listing
  */
-export function renderDebts(state, onAddPayment, onAddIncrease, onDelete) {
+export function renderDebts(state, onAddPayment, onAddIncrease, onDelete, onReorder) {
   const debtsListEl = document.getElementById('debts-list');
   const emptyStateEl = document.getElementById('debts-empty-state');
   const currency = state.settings.currency;
@@ -519,7 +519,7 @@ export function renderDebts(state, onAddPayment, onAddIncrease, onDelete) {
 
   debtsListEl.innerHTML = '';
 
-  debts.forEach(d => {
+  debts.forEach((d, idx) => {
     const card = document.createElement('div');
     card.className = `debt-item-card ${d.status === 'paid' ? 'paid' : ''}`;
 
@@ -562,7 +562,19 @@ export function renderDebts(state, onAddPayment, onAddIncrease, onDelete) {
           </div>
           <h4>${escapeHtml(d.person)}</h4>
         </div>
-        ${dueHtml}
+        <div style="display: flex; align-items: center; gap: 8px;">
+          ${dueHtml}
+          ${debts.length > 1 ? `
+            <div class="debt-reorder-buttons" style="display: flex; gap: 2px;">
+              <button class="action-icon-btn reorder-up" title="Mover arriba" ${idx === 0 ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>
+                <i data-lucide="chevron-up"></i>
+              </button>
+              <button class="action-icon-btn reorder-down" title="Mover abajo" ${idx === debts.length - 1 ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>
+                <i data-lucide="chevron-down"></i>
+              </button>
+            </div>
+          ` : ''}
+        </div>
       </div>
 
       <div class="debt-card-amounts">
@@ -612,6 +624,24 @@ export function renderDebts(state, onAddPayment, onAddIncrease, onDelete) {
       card.querySelector('.increase-debt').addEventListener('click', () => {
         onAddIncrease(d);
       });
+    }
+
+    if (debts.length > 1) {
+      const upBtn = card.querySelector('.reorder-up');
+      const downBtn = card.querySelector('.reorder-down');
+
+      if (idx > 0) {
+        upBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          onReorder(d.id, 'up');
+        });
+      }
+      if (idx < debts.length - 1) {
+        downBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          onReorder(d.id, 'down');
+        });
+      }
     }
 
     debtsListEl.appendChild(card);
