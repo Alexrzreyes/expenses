@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gastos-alexis-cache-v1';
+const CACHE_NAME = 'gastos-alexis-cache-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -53,7 +53,7 @@ self.addEventListener('fetch', (e) => {
             });
           }
         }).catch(() => { /* Silence errors when offline */ });
-        
+
         return cachedResponse;
       }
 
